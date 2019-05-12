@@ -1,0 +1,11 @@
+'5':
+  debounce: 4
+  url: http://127.0.0.1:5000/command/neo_off
+'6':
+  debounce: 1
+  url: http://127.0.0.1:5000/command/rotate
+LED_COUNT: 123
+LED_PIN: 5
+current_limit: '20'
+vel_limit: '20000'
+wheel_size: '3.5'

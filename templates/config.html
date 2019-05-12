@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>NeoPixel Driver</title>
+  <meta name="description" content="ODrive Web Interface" />
+  <meta name="keywords" content="ODrive" />
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+  <link rel="stylesheet" type="text/css" href="/static/style.css" title="style" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="index.html">ODrive<span class="logo_colour">Web Driver</span></a></h1>
+          <h2>Web Interface for Odrive</h2>
+        </div>
+      </div>
+      <div id="menubar">
+        <ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li class="selected"><a href="/">Home</a></li>
+          <li><a href="/config">Configuration</a></li>
+          <li><a href="/command">Command Interface</a></li>
+          <li><a href="/docs">Documentation</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="site_content">
+      <div class="sidebar">
+        <!-- insert your sidebar items here -->
+        <h3>Information</h3>
+        <h4>Version 0.8 Beta</h4>
+        <h5>May 11th, 2019</h5>
+        <p>First Implementation.</a></p>
+        <p></p>
+    
+        <h3>Source Code</h3>
+        <ul>
+          <li><a href="https://github.com/AndyThirtover/ODrive-Web">GitHub Project</a></li>
+        </ul>
+      </div>
+
+      <div id="content">
+<script>
+$.getJSON("/json_config", function(result){
+        $.each(result, function(key, field){
+            $('#'+key).val(field) ;
+        });
+    });
+</script>
+
+
+<h1>CONFIGURATION</h1>
+
+<form>
+    <table>
+        <tr>
+            <th>Value</th>
+            <th>Settings</th>
+        </tr>
+        <tr>
+            <td id='iname'>CURRENT LIMIT</td>
+            <td><input id='current_limit' type='number' name='current_limit' /></td>
+        </tr>
+        <tr>
+            <td id='iname'>TRAJECTORY VELOCITY LIMIT</td>
+            <td><input id='vel_limit' type='number' name='vel_limit' /></td>
+        </tr>
+        <tr>
+            <td id='iname'>WHEEL SIZE</td>
+            <td><input id='wheel_size' type='number' step=0.01 name='wheel_size' /></td>
+        </tr>
+        <tr>
+            <td id='iname'>COMPLETE</td>
+            <td><input type='submit' name='submit' value='SYSTEM' /></td>
+        </tr>
+    </table>
+</form>
+
+    <p>Any change of <em>LED Parameters</em> will require a program restart</p>
+
+<script>
+$.getJSON( "/button_config", function( data ) {
+  var items = [];
+  items.push("<tr><th>Pin</th><th>URL Called</th></tr>");
+  $.each( data, function( key, val ) {
+    items.push( "<tr>");
+    items.push( "<td id='" + key + "'>" + key + "</td>" );
+    items.push( "<td><input type='text' name='" + key + "' value='" + val.url + "'</input></td>" );
+    items.push( "</tr>");
+  });
+  items.push("<tr><td>COMPLETE</td><td><input type='submit' name='submit' value='BUTTONS'/></td></tr>");
+ 
+  $( "<table/>", {
+    "class": "bdefinitions",
+    html: items.join( "" )
+  }).appendTo( "#bconfig" );
+});
+</script>
+
+<h1>BUTTON CONFIGURATION</h1>
+<form id='bconfig'>
+</form>
+
+
+      </div>
+
+    </div>
+    <div id="footer">
+      Copyright &copy; WbAV Productions | <a href="http://wbavproductions.co.uk">WbAV Productions</a> 
+    </div>
+  </div>
+</body>
+</html>

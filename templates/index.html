@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>ODrive Driver</title>
+  <meta name="description" content="ODrive Web Driver" />
+  <meta name="keywords" content="ODrive" />
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+  <link rel="stylesheet" type="text/css" href="/static/style.css" title="style" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
+</head>
+
+<body>
+
+<script>
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+socket.on('connect', function() {
+    socket.emit('message', {data: 'main index page'});
+    console.log("Asked to connect");
+});
+
+
+socket.on('message', function(e){
+  console.log("Got Message:", e.status);
+  $('#connection_status').text(e.status);
+});
+
+
+socket.on('odrive_data', function(e){
+  console.log("Got data:", e);
+  $('#Volts').text(e.volts);
+  $('#Current').text(e.current_limit);
+  $('#Speed').text(e.speed);
+});
+
+// This seems lame! but 10 seconds isn't so much load
+setInterval(function(){
+  socket.emit('get_data',{'data': 'Asked for odrive_data'})
+  }
+  ,10000);
+
+</script>
+
+  <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="index.html">Odrive<span class="logo_colour">Driver</span></a></h1>
+          <h2>Simple Web Driven ODrive Interface</h2>
+        </div>
+      </div>
+      <div id="menubar">
+        <ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li class="selected"><a href="/">Home</a></li>
+          <li><a href="/config">Configuration</a></li>
+          <li><a href="/command">Command Interface</a></li>
+          <li><a href="/docs">Documentation</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="site_content">
+      <div class="sidebar">
+        <!-- insert your sidebar items here -->
+        <h3>Information</h3>
+        <h4>Version 0.8 Beta</h4>
+        <h5>May 11th, 2019</h5>
+        <p>First Implementation.</a></p>
+        <p></p>
+    
+        <h3>Source Code</h3>
+        <ul>
+          <li><a href="https://github.com/AndyThirtover/ODrive-Web">GitHub Project</a></li>
+        </ul>
+      </div>
+      <div id="content">
+<table>
+  <tr>
+    <th colspan='4'>MOTOR &nbsp; &nbsp; &nbsp;   BUS VOLTS:<span id='Volts'>UNK</span>V CURRENT LIMIT:<span id='Current'>UNK</span>A Speed:<span id='Speed'>UNK</span></th>
+  </tr>
+  <tr>
+    <td class='button' onclick="window.location.href='/queue/scycle/8192/0.1'"> 1 Rev 0.1 </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/32767/1'"> 4 Rev 1.0 </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/2048/0.01'"> 1/4 Rev 0.01 </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/4096/0.06'"> 1/2 Rev 0.06 </td>
+  </tr>
+  <tr>
+    <td class='button' onclick="window.location.href='/queue/scycle/8192'"> 1 Rev S-Cycles </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/32767'"> 4 Rev S-Cycles </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/2048'"> 1/4 Rev S-Cycles </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/4096'"> 1/2 Rev S-Cycles </td>
+  </tr>
+  <tr>
+    <td class='button' onclick="window.location.href='/queue/scycle/2048/0.02'"> 1/4 Rev 0.04 </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/2048/0.06'"> 1/4 Rev 0.06 </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/2048/0.08'"> 1/4 Rev 0.08 </td>
+    <td class='button' onclick="window.location.href='/queue/scycle/2048/0.1'"> 1/4 Rev 0.1 </td>
+  </tr>
+  <tr>
+    <td class='button' onclick="window.location.href='/queue/current/1'"> Current 1A </td>
+    <td class='button' onclick="window.location.href='/queue/current/2'"> Current 2A </td>
+    <td class='button' onclick="window.location.href='/queue/current/10'"> Current 10A </td>
+    <td class='button' onclick="window.location.href='/queue/current/20'"> Current 20A </td>
+  </tr>
+  <tr>
+    <th colspan='4'>SOCKET IO TEST</th>
+  </tr>
+  <tr>
+    <td class='button' onclick="socket.emit('do_job',{'scycle': '2048/0.02'});"> 1/4 Rev 0.02 </td>
+    <td class='button' onclick="socket.emit('do_job',{'scycle': '4096/0.04'});"> 1/2 Rev 0.04 </td>
+    <td class='button' onclick="socket.emit('do_job',{'scycle': '6000/0.06'});"> 3/4 Rev 0.06 </td>
+    <td class='button' onclick="socket.emit('do_job',{'scycle': '8192/0.08'});"> 1 Rev 0.08 </td>
+  </tr>
+  <tr>
+    <td class='button' onclick="socket.emit('do_job',{'current': '10'});"> Current 10A </td>
+    <td class='button' onclick="socket.emit('do_job',{'current': '20'});"> Current 20A </td>
+    <td class='button' onclick="socket.emit('do_job',{'current': '30'});"> Current 30A </td>
+    <td class='button' onclick="socket.emit('do_job',{'current': '50'});"> Current 50A </td>
+  </tr>
+  <tr>
+    <th colspan='4'>SLOW SPEED TESTS</th>
+  </tr>
+  <tr>
+    <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/2'});"> Move to 5000/2 </td>
+    <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/20'});"> Move to 5000/20 </td>
+    <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/200'});"> Move to 5000/200 </td>
+    <td class='button' onclick="socket.emit('do_job',{'cancel_trajectory': 'NOP'});"> Cancel Move </td>
+  </tr>
+  
+
+</table>
+      </div>
+    </div>
+    <div id="footer">
+      Copyright &copy; WbAV Productions | <a href="http://wbavproductions.co.uk">WbAV Productions</a> 
+    </div>
+  </div>
+</body>
+</html>
