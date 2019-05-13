@@ -126,6 +126,12 @@ def handle_message(message):
     print('===================== Received message: ' + repr(message))
     socketio.emit('message',{'status':'good'})
 
+@socketio.on('read_pos')
+def handle_read_position(message):
+    print('READ_POS===================== Received message: ' + repr(message))
+    position = read_position()
+    socketio.emit('Position',{'location': message['location'], 'position': position})
+
 @socketio.on('get_data')
 def handle_get_data(message):
     global thread_data

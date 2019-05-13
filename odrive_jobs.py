@@ -63,6 +63,9 @@ def get_odrive_data():
         print('voltage on GPIO{} is {} Volt'.format(i, my_drive.get_adc_voltage(i)))
     """
 
+def read_position():
+    return my_drive.axis0.encoder.pos_estimate
+
 def set_current(current_limit):
     my_drive.axis0.motor.config.current_lim = current_limit
     thread_data['current_limit'] = current_limit

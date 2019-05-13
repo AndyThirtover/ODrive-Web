@@ -27,6 +27,11 @@ socket.on('message', function(e){
   $('#connection_status').text(e.status);
 });
 
+socket.on('Position', function(e){
+  console.log("Got Position:", e.position);
+  document.getElementById(e.location).value = e.position;
+});
+
 
 socket.on('odrive_data', function(e){
   console.log("Got data:", e);
@@ -42,6 +47,18 @@ setInterval(function(){
   ,10000);
 
 </script>
+<script>
+
+function journey(data_id) {
+    socket.emit('do_job',{'trajectory_to': document.getElementById(data_id).value});
+}
+
+function read_pos(data_id) {
+    socket.emit('read_pos',{'location': data_id}) ;  // ask odrive what the current position is, to be returned named data_is
+}
+
+</script>
+
 
   <div id="main">
     <div id="header">
@@ -129,6 +146,22 @@ setInterval(function(){
     <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/20'});"> Move to 5000/20 </td>
     <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/200'});"> Move to 5000/200 </td>
     <td class='button' onclick="socket.emit('do_job',{'cancel_trajectory': 'NOP'});"> Cancel Move </td>
+  </tr>
+  <tr>
+    <th colspan='4'>JOURNEY TEST</th>
+  </tr>
+  <tr>
+    <td class='button' onclick="journey('number1');" >Goto NO.1 </td> <td><input id='number1'>Position/Speed</input> </td> 
+    <td class='button' onclick="read_pos('number1');">READ NO.1</td>
+  </tr>
+  <tr>
+    <td class='button' onclick="journey('number2');" >Goto NO.2 </td> <td><input id='number2'>Position/Speed</input> </td>
+  </tr>
+  <tr>
+    <td class='button' onclick="journey('number3');" >Goto NO.3 </td> <td><input id='number3'>Position/Speed</input> </td>
+  </tr>
+  <tr>
+    <td class='button' onclick="journey('number4');" >Goto NO.4 </td> <td><input id='number4'>Position/Speed</input> </td>
   </tr>
   
 
