@@ -60,6 +60,8 @@ def job_queue(job, parameter=None, parameter2=None):
         cancel_trajectory()
     elif job == 'move_to':
         move_to(parameter)
+    elif job == 'set_state':
+        set_state(parameter)
     
 
 @app.route('/')
@@ -137,7 +139,13 @@ def handle_get_data(message):
     global thread_data
     get_odrive_data()
     print('===================== Received message: ' + repr(message))
-    socketio.emit('odrive_data',{'volts': thread_data['volts'], 'current_limit': thread_data['current_limit'], 'speed': thread_data['speed']})
+    socketio.emit('odrive_data',{'volts': thread_data['volts'], 
+        'current_limit': thread_data['current_limit'], 
+        'speed': thread_data['speed'],
+        'trajectory_speed_limit' : thread_data['trajectory_speed_limit'],
+        'state' : thread_data['state'],
+        'estimated_pos' : thread_data['estimated_pos']
+        })
 
 @socketio.on('do_job')
 def handle_do_job(message):

@@ -29,15 +29,19 @@ socket.on('message', function(e){
 
 socket.on('Position', function(e){
   console.log("Got Position:", e.position);
-  document.getElementById(e.location).value = e.position;
+  console.log("Got Location:", e.location);
+  $(e.location).val(e.position);
 });
 
 
 socket.on('odrive_data', function(e){
   console.log("Got data:", e);
-  $('#Volts').text(e.volts);
-  $('#Current').text(e.current_limit);
-  $('#Speed').text(e.speed);
+  $('#Volts').text(e.volts + 'V');
+  $('#Current').text(e.current_limit + 'A');
+  $('#Speed').text(e.speed + 'PPS');
+  $('#state').text(e.state);
+  $('#estimated_pos').text(e.estimated_pos);
+  $('#trajectory_speed_limit').text(e.trajectory_speed_limit + 'PPS');
 });
 
 // This seems lame! but 10 seconds isn't so much load
@@ -50,11 +54,17 @@ setInterval(function(){
 <script>
 
 function journey(data_id) {
-    socket.emit('do_job',{'trajectory_to': document.getElementById(data_id).value});
+    to_pos = $('#' + data_id).val();
+    if (to_pos == '') {
+        alert("Please enter a Position");
+        return;
+    }
+    speed = $('#' + data_id + 'speed').val();
+    socket.emit('do_job',{'trajectory_to': to_pos+'/'+speed});
 }
 
 function read_pos(data_id) {
-    socket.emit('read_pos',{'location': data_id}) ;  // ask odrive what the current position is, to be returned named data_is
+    socket.emit('read_pos',{'location': '#' + data_id}) ;  // ask odrive what the current position is, to be returned named data_is
 }
 
 </script>
@@ -65,7 +75,7 @@ function read_pos(data_id) {
       <div id="logo">
         <div id="logo_text">
           <!-- class="logo_colour", allows you to change the colour of the text -->
-          <h1><a href="index.html">Odrive<span class="logo_colour">Driver</span></a></h1>
+          <h1><a href="index.html">ODrive<span class="logo_colour">Web Driver</span></a></h1>
           <h2>Simple Web Driven ODrive Interface</h2>
         </div>
       </div>
@@ -97,7 +107,22 @@ function read_pos(data_id) {
       <div id="content">
 <table>
   <tr>
-    <th colspan='4'>MOTOR &nbsp; &nbsp; &nbsp;   BUS VOLTS:<span id='Volts'>UNK</span>V CURRENT LIMIT:<span id='Current'>UNK</span>A Speed:<span id='Speed'>UNK</span></th>
+    <th colspan='4'>DRIVE PARAMETERS</th>
+  </tr>
+  <tr>
+    <td>BUS VOLTS</td><td class='value' id='Volts'>No Reading</td>
+    <td>CURRENT LIMIT</td><td class='value' id='Current'>No Reading</td>
+  </tr>
+  <tr>
+    <td>TO POS SPEED LIMIT</td><td class='value' id='Speed'>No Reading</td>
+    <td>TRAJECTORY SPEED</td><td class='value' id='trajectory_speed_limit'>No Reading</td>
+  </tr>
+  <tr>
+    <td>STATE</td><td class='value' id='state'>No Reading</td>
+    <td>POSITION</td><td class='value' id='estimated_pos'>No Reading</td>
+  </tr>
+  <tr>
+    <th colspan='4'>BASIC TESTS</th>
   </tr>
   <tr>
     <td class='button' onclick="window.location.href='/queue/scycle/8192/0.1'"> 1 Rev 0.1 </td>
@@ -118,19 +143,13 @@ function read_pos(data_id) {
     <td class='button' onclick="window.location.href='/queue/scycle/2048/0.1'"> 1/4 Rev 0.1 </td>
   </tr>
   <tr>
-    <td class='button' onclick="window.location.href='/queue/current/1'"> Current 1A </td>
-    <td class='button' onclick="window.location.href='/queue/current/2'"> Current 2A </td>
-    <td class='button' onclick="window.location.href='/queue/current/10'"> Current 10A </td>
-    <td class='button' onclick="window.location.href='/queue/current/20'"> Current 20A </td>
-  </tr>
-  <tr>
-    <th colspan='4'>SOCKET IO TEST</th>
-  </tr>
-  <tr>
     <td class='button' onclick="socket.emit('do_job',{'scycle': '2048/0.02'});"> 1/4 Rev 0.02 </td>
     <td class='button' onclick="socket.emit('do_job',{'scycle': '4096/0.04'});"> 1/2 Rev 0.04 </td>
     <td class='button' onclick="socket.emit('do_job',{'scycle': '6000/0.06'});"> 3/4 Rev 0.06 </td>
     <td class='button' onclick="socket.emit('do_job',{'scycle': '8192/0.08'});"> 1 Rev 0.08 </td>
+  </tr>
+  <tr>
+    <th colspan='4'>SET CURRENT LIMIT</th>
   </tr>
   <tr>
     <td class='button' onclick="socket.emit('do_job',{'current': '10'});"> Current 10A </td>
@@ -139,11 +158,11 @@ function read_pos(data_id) {
     <td class='button' onclick="socket.emit('do_job',{'current': '50'});"> Current 50A </td>
   </tr>
   <tr>
-    <th colspan='4'>SLOW SPEED TESTS</th>
+    <th colspan='4'>DRIVE STATE</th>
   </tr>
   <tr>
-    <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/2'});"> Move to 5000/2 </td>
-    <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/20'});"> Move to 5000/20 </td>
+    <td class='button' onclick="socket.emit('do_job',{'set_state': 'RUN'});"> ENABLE DRIVE </td>
+    <td class='button' onclick="socket.emit('do_job',{'set_state': 'IDLE'});"> IDLE DRIVE </td>
     <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/200'});"> Move to 5000/200 </td>
     <td class='button' onclick="socket.emit('do_job',{'cancel_trajectory': 'NOP'});"> Cancel Move </td>
   </tr>
@@ -151,17 +170,28 @@ function read_pos(data_id) {
     <th colspan='4'>JOURNEY TEST</th>
   </tr>
   <tr>
-    <td class='button' onclick="journey('number1');" >Goto NO.1 </td> <td><input id='number1'>Position/Speed</input> </td> 
+    <td class='go_button' onclick="journey('number1');" >Goto NO.1 </td> 
+    <td><input id='number1'>Position</input> </td>
+    <td><input id='number1speed' value='200'>Speed</input> </td>     
     <td class='button' onclick="read_pos('number1');">READ NO.1</td>
   </tr>
   <tr>
-    <td class='button' onclick="journey('number2');" >Goto NO.2 </td> <td><input id='number2'>Position/Speed</input> </td>
+    <td class='go_button' onclick="journey('number2');" >Goto NO.2 </td> 
+    <td><input id='number2'>Position</input> </td>
+    <td><input id='number2speed' value='200'>Speed</input> </td>     
+    <td class='button' onclick="read_pos('number2');">READ NO.2</td>
   </tr>
   <tr>
-    <td class='button' onclick="journey('number3');" >Goto NO.3 </td> <td><input id='number3'>Position/Speed</input> </td>
+    <td class='go_button' onclick="journey('number3');" >Goto NO.3 </td> 
+    <td><input id='number3'>Position</input> </td>
+    <td><input id='number3speed' value='200'>Speed</input> </td>     
+    <td class='button' onclick="read_pos('number3');">READ NO.3</td>
   </tr>
   <tr>
-    <td class='button' onclick="journey('number4');" >Goto NO.4 </td> <td><input id='number4'>Position/Speed</input> </td>
+    <td class='go_button' onclick="journey('number4');" >Goto NO.4 </td> 
+    <td><input id='number4'>Position</input> </td>
+    <td><input id='number4speed' value='200'>Speed</input> </td>     
+    <td class='button' onclick="read_pos('number4');">READ NO.4</td>
   </tr>
   
 

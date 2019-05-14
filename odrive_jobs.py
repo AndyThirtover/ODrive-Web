@@ -18,7 +18,10 @@ cfg_filename = 'odrive.yaml'
 thread_data = {'count' : 0,
                 'volts' : 0,
                 'current_limit' : 0,
-                'speed' : 0
+                'speed' : 0,
+                'trajectory_speed_limit' : 0,
+                'estimated_pos' : 0,
+                'state' : 0
             }
 
 
@@ -56,6 +59,11 @@ def calibrate_axis0():
 def get_odrive_data():
     thread_data['volts'] = '{:.{prec}f}'.format(my_drive.vbus_voltage, prec=2)
     thread_data['speed'] = '{:.{prec}f}'.format(my_drive.axis0.controller.config.vel_limit, prec=2)
+    thread_data['current_limit'] = '{:.{prec}f}'.format(my_drive.axis0.motor.config.current_lim, prec=2)
+    thread_data['trajectory_speed_limit'] = '{:.{prec}f}'.format(my_drive.axis0.trap_traj.config.vel_limit, prec=2)
+    thread_data['estimated_pos'] = '{:.{prec}f}'.format(my_drive.axis0.encoder.pos_estimate, prec=2)
+    thread_data['state'] = get_state()
+
     
     print("BUS Volts:{} CURRENT Limit:{}  SPEED:{}".format(thread_data['volts'],thread_data['current_limit'],thread_data['speed']))
     """
@@ -64,7 +72,9 @@ def get_odrive_data():
     """
 
 def read_position():
-    return my_drive.axis0.encoder.pos_estimate
+    pos = my_drive.axis0.encoder.pos_estimate
+    thread_data['estimated_pos'] = pos
+    return pos
 
 def set_current(current_limit):
     my_drive.axis0.motor.config.current_lim = current_limit
@@ -116,6 +126,21 @@ def trajectory_to(to_pos,speed=None):
 
 def cancel_trajectory():
     trajectory_to(my_drive.axis0.encoder.pos_estimate,20000)
+
+def set_state(state='IDLE'):
+    if (state == 'IDLE'):
+        my_drive.axis0.requested_state = AXIS_STATE_IDLE         
+    else:
+        my_drive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+        my_drive.axis0.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
+
+def get_state():
+    if (my_drive.axis0.current_state == AXIS_STATE_IDLE):
+        return 'IDLE'
+    elif (my_drive.axis0.current_state == AXIS_STATE_CLOSED_LOOP_CONTROL):
+        return 'CLOSED LOOP'
+    else:
+        return 'OTHER'
 
 #
 #   Run on Start-up

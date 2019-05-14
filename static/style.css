@@ -297,3 +297,17 @@ table tr td
 td.button:hover {
   background-color: #A0AFA2;
 }
+
+td.go_button:hover {
+  background-color: #008800;
+}
+
+td.go_button {
+  background-color: #00FF00;
+}
+
+td.value, td input{
+  font-weight: bold;
+  color: #1293EE;
+}
+
