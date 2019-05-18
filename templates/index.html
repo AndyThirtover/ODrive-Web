@@ -40,8 +40,11 @@ socket.on('odrive_data', function(e){
   $('#Current').text(e.current_limit + 'A');
   $('#Speed').text(e.speed + 'PPS');
   $('#state').text(e.state);
+  $('#rotation_velocity').text(e.rotation_velocity + 'PPS');
   $('#estimated_pos').text(e.estimated_pos);
   $('#trajectory_speed_limit').text(e.trajectory_speed_limit + 'PPS');
+  $('#command_current').text(e.command_current + 'A');
+  $('#measured_current').text(e.measured_current + 'A');
 });
 
 // This seems lame! but 10 seconds isn't so much load
@@ -118,8 +121,15 @@ function read_pos(data_id) {
     <td>TRAJECTORY SPEED</td><td class='value' id='trajectory_speed_limit'>No Reading</td>
   </tr>
   <tr>
-    <td>STATE</td><td class='value' id='state'>No Reading</td>
+    <td>ROTATION VELOCITY</td><td class='value' id='rotation_velocity'>No Reading</td>
     <td>POSITION</td><td class='value' id='estimated_pos'>No Reading</td>
+  </tr>
+  <tr>
+    <td>COMMAND CURRENT</td><td class='value' id='command_current'>No Reading</td>
+    <td>MEASURED CURRENT</td><td class='value' id='measured_current'>No Reading</td>
+  </tr>
+  <tr>
+    <td>STATE</td><td class='value' id='state'>No Reading</td>
   </tr>
   <tr>
     <th colspan='4'>BASIC TESTS</th>

@@ -110,6 +110,10 @@ def command_queue(job="NoJob", parameter=None, parameter2=None):
 def show_docs():
     return render_template('docs.html', name='Show Docs')
 
+@app.route('/login')
+def show_login():
+    return render_template('login.html', name='Login')
+
 @app.route('/contact')
 def show_contact():
     return render_template('contact.html', name='Show Contact Page')
@@ -118,10 +122,20 @@ def show_contact():
 def show_action():
     return render_template('action.html', name='SocketIO Action Page')
 
+#
+#  SOCKETIO STUFF NEXT
+#
+
 @socketio.on('connect')
 def handle_connect():
     print ("==================== Accepted Connection")
     socketio.emit('accept', {'name':'NeoPixel Driver'})
+
+@socketio.on('login')
+def handle_login(message):
+    print ("=== LOGIN ATTEMPT =================")
+    # There isn't a login yet, this is for Kev's template testing
+    socketio.emit('login_accepted', {'page':'/'})
 
 @socketio.on('message')
 def handle_message(message):
@@ -144,7 +158,10 @@ def handle_get_data(message):
         'speed': thread_data['speed'],
         'trajectory_speed_limit' : thread_data['trajectory_speed_limit'],
         'state' : thread_data['state'],
-        'estimated_pos' : thread_data['estimated_pos']
+        'estimated_pos' : thread_data['estimated_pos'],
+        'rotation_velocity' : thread_data['rotation_velocity'],
+        'command_current' : thread_data['command_current'],
+        'measured_current' : thread_data['measured_current']
         })
 
 @socketio.on('do_job')

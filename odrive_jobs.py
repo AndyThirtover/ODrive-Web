@@ -21,7 +21,9 @@ thread_data = {'count' : 0,
                 'speed' : 0,
                 'trajectory_speed_limit' : 0,
                 'estimated_pos' : 0,
-                'state' : 0
+                'state' : 0,
+                'command_current' : 0,
+                'measured_current' : 0
             }
 
 
@@ -62,8 +64,10 @@ def get_odrive_data():
     thread_data['current_limit'] = '{:.{prec}f}'.format(my_drive.axis0.motor.config.current_lim, prec=2)
     thread_data['trajectory_speed_limit'] = '{:.{prec}f}'.format(my_drive.axis0.trap_traj.config.vel_limit, prec=2)
     thread_data['estimated_pos'] = '{:.{prec}f}'.format(my_drive.axis0.encoder.pos_estimate, prec=2)
+    thread_data['rotation_velocity'] = '{:.{prec}f}'.format(my_drive.axis0.encoder.vel_estimate, prec=2)
     thread_data['state'] = get_state()
-
+    thread_data['command_current'] = '{:.{prec}f}'.format(my_drive.axis0.motor.current_control.Iq_setpoint, prec=2)
+    thread_data['measured_current'] = '{:.{prec}f}'.format(my_drive.axis0.motor.current_control.Iq_measured, prec=2)
     
     print("BUS Volts:{} CURRENT Limit:{}  SPEED:{}".format(thread_data['volts'],thread_data['current_limit'],thread_data['speed']))
     """
