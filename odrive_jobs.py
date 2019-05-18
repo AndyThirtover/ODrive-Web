@@ -9,6 +9,8 @@ import odrive
 import numpy
 from odrive.enums import *
 
+from mock import MagicMock
+TESTING = True
 
 speed_limit = 10
 cfg_speed = 0
@@ -25,6 +27,24 @@ thread_data = {'count' : 0,
                 'command_current' : 0,
                 'measured_current' : 0
             }
+
+
+def mock_drive():
+    mock_d = MagicMock()
+    mock_d.vbus_voltage = 99.999
+    mock_d.axis0 = MagicMock()
+    mock_d.axis0.current_state = AXIS_STATE_IDLE
+    mock_d.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+    mock_d.axis0.controller.config.vel_limit = 2000
+    mock_d.axis0.trap_traj.config.vel_limit = 200
+    mock_d.axis0.motor.config.current_lim = 12.34
+    mock_d.axis0.encoder.pos_estimate = 789
+    mock_d.axis0.encoder.vel_estimate = 43.21
+    mock_d.axis0.motor.current_control.Iq_setpoint = 12.78
+    mock_d.axis0.motor.current_control.Iq_measured = 6.34
+
+    return mock_d
+
 
 
 def read_config(config):
@@ -152,7 +172,10 @@ def get_state():
 config = read_config(config)
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
-my_drive = odrive.find_any()
+if TESTING:
+    my_drive = mock_drive()
+else:
+    my_drive = odrive.find_any()
 
 calibrate_axis0()
 get_odrive_data()
