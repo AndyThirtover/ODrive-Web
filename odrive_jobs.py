@@ -10,7 +10,7 @@ import numpy
 from odrive.enums import *
 
 from mock import MagicMock
-TESTING = True
+TESTING = False
 
 speed_limit = 10
 cfg_speed = 0
@@ -25,7 +25,9 @@ thread_data = {'count' : 0,
                 'estimated_pos' : 0,
                 'state' : 0,
                 'command_current' : 0,
-                'measured_current' : 0
+                'measured_current' : 0,
+                'dynamic_pos' : 0,
+                'dynamic_wait' : 0
             }
 
 
@@ -148,7 +150,8 @@ def trajectory_to(to_pos,speed=None):
         my_drive.axis0.trap_traj.config.vel_limit = speed
     my_drive.axis0.controller.move_to_pos(to_pos)
 
-def cancel_trajectory():
+def cancel_trajectory(event):
+    event.set()  # this will clear any running tasks
     trajectory_to(my_drive.axis0.encoder.pos_estimate,20000)
 
 def set_state(state='IDLE'):

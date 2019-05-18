@@ -306,6 +306,14 @@ td.go_button {
   background-color: #00FF00;
 }
 
+td.stop_button:hover {
+  background-color: #880000;
+}
+
+td.stop_button {
+  background-color: #FF0000;
+}
+
 td.value, td input{
   font-weight: bold;
   color: #1293EE;

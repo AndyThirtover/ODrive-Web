@@ -8,6 +8,7 @@ import logging
 import time
 import random
 from odrive_jobs import *
+from threaded_jobs import *
 from buttons import *
 import atexit
 
@@ -46,7 +47,7 @@ def do_config(formargs):
 
 
 def job_queue(job, parameter=None, parameter2=None):
-    if job == 'cycle':
+    if job == 'test':
         test_run(parameter)
     elif job == 'tcycle':
         time_run(parameter)
@@ -57,11 +58,25 @@ def job_queue(job, parameter=None, parameter2=None):
     elif job == 'trajectory_to':
         trajectory_to(parameter,parameter2)
     elif job == 'cancel_trajectory':
-        cancel_trajectory()
+        cancel_trajectory(odrive_event)
     elif job == 'move_to':
         move_to(parameter)
     elif job == 'set_state':
         set_state(parameter)
+    elif job == 'cycle':
+        odrive_event.set()
+        cycle_thread = threading.Thread(name='Cycle',
+                                         target=do_cycle,
+                                         args=(odrive_event,parameter,parameter2))
+        cycle_thread.start()
+    elif job == 'set_dynamic':
+        set_dynamic(parameter,parameter2)
+    elif job == 'do_dynamic':
+        odrive_event.set()
+        dynamic_thread = threading.Thread(name='Dynamic',
+                                         target=dynamic_cycle,
+                                         args=(odrive_event,parameter,parameter2))
+        dynamic_thread.start()
     
 
 @app.route('/')
@@ -113,6 +128,10 @@ def show_docs():
 @app.route('/login')
 def show_login():
     return render_template('login.html', name='Login')
+
+@app.route('/dynamic')
+def show_dynamic():
+    return render_template('dynamic.html', name='Dynamic')
 
 @app.route('/contact')
 def show_contact():

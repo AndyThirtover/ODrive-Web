@@ -160,7 +160,7 @@ function read_pos(data_id) {
   <tr>
     <td class='button' onclick="socket.emit('do_job',{'set_state': 'RUN'});"> ENABLE DRIVE </td>
     <td class='button' onclick="socket.emit('do_job',{'set_state': 'IDLE'});"> IDLE DRIVE </td>
-    <td class='button' onclick="socket.emit('do_job',{'trajectory_to': '5000/200'});"> Move to 5000/200 </td>
+    <td class='button' onclick="socket.emit('do_job',{'cycle': '4096/0.06'});"> Cycle test </td>
     <td class='button' onclick="socket.emit('do_job',{'cancel_trajectory': 'NOP'});"> Cancel Move </td>
   </tr>
   <tr>
@@ -190,6 +190,7 @@ function read_pos(data_id) {
     <td><input id='number4speed' value='200'>Speed</input> </td>     
     <td class='button' onclick="read_pos('number4');">READ NO.4</td>
   </tr>
+
   
 
 </table>
