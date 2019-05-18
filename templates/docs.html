@@ -16,17 +16,16 @@
       <div id="logo">
         <div id="logo_text">
           <!-- class="logo_colour", allows you to change the colour of the text -->
-          <h1><a href="index.html">NeoPixel<span class="logo_colour">Driver</span></a></h1>
-          <h2>Simple Web Driven NeoPixel Driver</h2>
+          <h1><a href="index.html">ODrive<span class="logo_colour">Web Driver</span></a></h1>
+          <h2>Web ODrive Interface</h2>
         </div>
       </div>
       <div id="menubar">
         <ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-          <li class="selected"><a href="/">Home</a></li>
+          <li><a href="/">Home</a></li>
           <li><a href="/config">Configuration</a></li>
-          <li><a href="/command">Command Interface</a></li>
-          <li><a href="/docs">Documentation</a></li>
+          <li class="selected"><a href="/docs">Documentation</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
@@ -35,44 +34,24 @@
       <h2>Command URLS</h2>
       <table>
         <tr>
-          <th>URL Called</th>
+          <th>Command</th>
           <th>Actions</th>
         </tr>
         <tr>
-          <td> /command/neo_off </td>
-          <td> All NeoPixels to OFF, all threads cancelled.  Can have issues when too many threads are running.</td>
+          <td> trajectory_to 'position'/'speed'</td>
+          <td> Move to 'position' at a maximum of 'speed', another can be issued at any point</td>
         </tr>
         <tr>
-          <td> /command/centre_fade/wash </td>
-          <td> Builds the fade to the colours defined in configuration.</td>
+          <td> set_state ['IDLE'|'RUN'] </td>
+          <td> sets the motor drive to IDLE or RUN</td>
         </tr>
         <tr>
-          <td> /command/random_change/wash </td>
-          <td> Uses a random patern to bring all Pixels to the wash colour defined in the configuration. </td>
+          <td> current 'value' </td>
+          <td> Set maximium motor current to 'value' in amps</td>
         </tr>
         <tr>
-          <td> /command/random_change/red[green,amber] </td>
-          <td> Uses a random patern to bring all Pixels to Red, Green or Amber. </td>
-        </tr>
-        <tr>
-          <td> /command/rotate </td>
-          <td> Rotates all Pixels through R,G,B in a chain, can be resource intensive with chains of more than 150 Pixels. </td>
-        </tr>
-        <tr>
-          <td> /command/blend </td>
-          <td> Creates a Blend from Wash 1 on the left to Wash 2 on the right.</td>
-        </tr>
-        <tr>
-          <td> /command/random_pastel </td>
-          <td> Calculates a new random pastel colour for each Pixel.</td>
-        </tr>
-        <tr>
-          <td> /command/twinkle[/[int]] </td>
-          <td> Starts a thread that continously calculates a new random pastel colour for each Pixel.  The integer value is an optional delay in milliseconds between each calculation.</td>
-        </tr>
-        <tr>
-          <td> /command/twinkle_fade[/[int]] </td>
-          <td> Starts a thread that continously calculates a new random pastel colour for each Pixel then fades to that colour.  The integer value is an optional delay in milliseconds between each calculation.</td>
+          <td> cancel_trajectory NOP </td>
+          <td> cancels a trajectory_to - the NOP is required </td>
         </tr>
       </table>
 
