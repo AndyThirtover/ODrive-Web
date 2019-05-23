@@ -51,7 +51,7 @@ socket.on('odrive_data', function(e){
 setInterval(function(){
   socket.emit('get_data',{'data': 'Asked for odrive_data'})
   }
-  ,10000);
+  ,1000);
 
 </script>
 <script>

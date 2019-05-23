@@ -1,10 +1,19 @@
 import threading
 import time
-import RPi.GPIO as GPIO
 import urllib
 import yaml
 import os.path
+from mock import MagicMock
 
+TESTING = True
+
+#
+#  So that we can run on other systems
+#
+if TESTING:
+    GPIO = MagicMock()
+else:
+    import RPi.GPIO as GPIO
 
 # debounce is number of times that sleep_time need to have passed to consider the button pressed.
 # keep_out is the time before another button press can be processed.
@@ -15,6 +24,9 @@ button_config_file = "buttons.yaml"
 
 
 buttons = {}
+
+GPIO = MagicMock()
+
 
 def read_button_config(filename):
     global buttons

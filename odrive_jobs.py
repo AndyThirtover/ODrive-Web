@@ -10,7 +10,7 @@ import numpy
 from odrive.enums import *
 
 from mock import MagicMock
-TESTING = False
+TESTING = True
 
 speed_limit = 10
 cfg_speed = 0
@@ -30,22 +30,54 @@ thread_data = {'count' : 0,
                 'dynamic_wait' : 0
             }
 
+class test_encoder():
+    pos_estimate_read = True
+    _pos_estimate = 789.1
+    vel_estimate = 43.21
+    @property
+    def pos_estimate(self):
+        if self.pos_estimate_read:
+            self._pos_estimate = self._pos_estimate + random.random()
+        return self._pos_estimate
+
+class test_current_control():
+    Iq_setpoint = 12.78
+    _Iq_measured = 6.34
+    @property
+    def Iq_measured(self):
+        return 6.34 + random.random()
+
+class test_motor():
+    config = MagicMock()
+    config.current_lim = 12.34
+    current_control = test_current_control()
+
+class test_axis():
+    current_state_read = False
+    _current_state = AXIS_STATE_IDLE
+    requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+    controller = MagicMock()
+    controller.config.vel_limit = 2000.1
+    trap_traj = MagicMock()
+    trap_traj.config.vel_limit = 200.1
+    encoder = test_encoder()
+    motor = test_motor()
+
+    @property
+    def current_state(self):
+        if self.current_state_read:
+            self._current_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+        else:
+            self._current_state = AXIS_STATE_IDLE
+        self.current_state_read = True
+        return self._current_state
+   
+class test_drive():
+    vbus_voltage = 99.999
+    axis0 = test_axis()
 
 def mock_drive():
-    mock_d = MagicMock()
-    mock_d.vbus_voltage = 99.999
-    mock_d.axis0 = MagicMock()
-    mock_d.axis0.current_state = AXIS_STATE_IDLE
-    mock_d.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-    mock_d.axis0.controller.config.vel_limit = 2000.1
-    mock_d.axis0.trap_traj.config.vel_limit = 200.1
-    mock_d.axis0.motor.config.current_lim = 12.34
-    mock_d.axis0.encoder.pos_estimate = 789.1
-    mock_d.axis0.encoder.vel_estimate = 43.21
-    mock_d.axis0.motor.current_control.Iq_setpoint = 12.78
-    mock_d.axis0.motor.current_control.Iq_measured = 6.34
-
-    return mock_d
+    return test_drive()
 
 
 
